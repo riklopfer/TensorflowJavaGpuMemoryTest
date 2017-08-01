@@ -12,7 +12,13 @@ if ! [ $TF_TYPE ]; then
     echo "Defaulting to TF_TYPE=${TF_TYPE}"
 fi
 
+# OS
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+
+# clean
+rm -rvf jni/
+rm -vf libtensorflow.jar
+
 mkdir -p ./jni
 curl -L "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow_jni-${TF_TYPE}-${OS}-x86_64-${TF_REV}.tar.gz" |
 tar --warning=no-timestamp -xz -C ./jni
