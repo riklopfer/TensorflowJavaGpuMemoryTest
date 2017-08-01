@@ -14,11 +14,11 @@ fi
 
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 mkdir -p ./jni
-curl -L "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow_jni-${TF_TYPE}-${OS}-x86_64-${TF_REV}.tar.gz" |
+curl --warning=no-timestamp -L "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow_jni-${TF_TYPE}-${OS}-x86_64-${TF_REV}.tar.gz" |
 tar -xz -C ./jni
 
 # Java jar
-curl -o libtensorflow.jar https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_REV}.jar
+curl --warning=no-timestamp  -o libtensorflow.jar https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_REV}.jar
 
 # build
 [ -d out ] || mkdir out
