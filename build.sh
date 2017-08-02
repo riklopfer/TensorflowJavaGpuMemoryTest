@@ -15,16 +15,20 @@ fi
 # OS
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 
+JNI_URL="https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow_jni-${TF_TYPE}-${OS}-x86_64-${TF_REV}.tar.gz"
+JAR_URL="https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_REV}.jar"
+
 # clean
 rm -rvf jni/
 rm -vf libtensorflow.jar
+mkdir ./jni
 
-mkdir -p ./jni
-curl -L "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow_jni-${TF_TYPE}-${OS}-x86_64-${TF_REV}.tar.gz" |
+echo "Downloading: ${JNI_URL}"
+curl -L ${JNI_URL} |
 tar --warning=no-timestamp -xz -C ./jni
 
-# Java jar
-curl -o libtensorflow.jar https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_REV}.jar
+echo "Downloading: ${JAR_URL}"
+curl -o libtensorflow.jar ${JAR_URL}
 
 # build
 [ -d out ] || mkdir out
