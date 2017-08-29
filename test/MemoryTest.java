@@ -20,26 +20,12 @@ public class MemoryTest {
     this.X = floatArray;
   }
 
-  private static final float[] CONSTANT_INTS = new float[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0}; 
-
-
   private static float[] randomFloats(int length) {
     Random rng = new Random();
     float[] floatArray = new float[length];
 
     for (int i=0; i<length; ++i) {
       floatArray[i] = rng.nextFloat();
-    }
-
-    return floatArray;
-  }
-
-  private static float[] randomIntFloats(int length) {
-    Random rng = new Random();
-    float[] floatArray = new float[length];
-
-    for (int i=0; i<length; ++i) {
-      floatArray[i] = rng.nextInt() % 10;
     }
 
     return floatArray;
@@ -99,19 +85,16 @@ public class MemoryTest {
   }
 
   public static void main(String[] args) throws Exception {
-    int numFloats = 50;
+    int numFloats = 1;
     if (args.length > 0) {
       numFloats = Integer.parseInt(args[0]);
+      if (numFloats < 1) {
+        throw new IllegalArgumentException("numFloats must be greater than zero.");
+      }
     }
 
     MemoryTest floatTest = new MemoryTest(randomFloats(numFloats));
     floatTest.testTensorFlowMemoryThreaded();
-
-    // MemoryTest intFloatTest = new MemoryTest(randomIntFloats(numFloats));
-    // intFloatTest.testTensorFlowMemoryThreaded();
-    
-    // MemoryTest intFloatTest = new MemoryTest(CONSTANT_INTS);
-    // intFloatTest.testTensorFlowMemoryThreaded();
   }
 
   public static class BusyWork implements Runnable {
@@ -130,8 +113,14 @@ public class MemoryTest {
         Tensor tx = Tensor.create(this.floatArray);
         List<Tensor> results = this.s.runner().feed("x", tx).fetch("y").run();
         tx.close();
-        for (Tensor result : results)
+
+        for (Tensor result : results) {
           result.close();
+        }
+
+        // if ((i + 1) % 1000 == 0) {
+        //   System.out.println("Finished " + (i+1) + " iterations");
+        // }
       }
       System.out.println("thread finished - " + Thread.currentThread().getName());
     }
