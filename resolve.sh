@@ -2,7 +2,7 @@
 
 # tensorflow revision
 if ! [ $TF_REV ]; then
-    TF_REV=1.3.0-rc1
+    TF_REV=1.3.0
     echo "Defaulting to TF_REV=${TF_REV}"
 fi
 
