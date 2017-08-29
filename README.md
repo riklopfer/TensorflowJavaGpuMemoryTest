@@ -51,6 +51,7 @@ export TF_TYPE=gpu
 ./build.sh
 
 # run
+export CUDA_VISIBLE_DEVICES=0
 ./run.sh
 ```
 
