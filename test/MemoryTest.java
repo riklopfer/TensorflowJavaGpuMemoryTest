@@ -47,7 +47,7 @@ public class MemoryTest {
 
 
   public void testTensorFlowMemory() {
-    System.out.println(Arrays.toString(X));
+    System.out.println("Processing " + this.X.length + " floats.");
 
     // create a graph and session
     try (Graph g = new Graph(); Session s = new Session(g)) {
@@ -74,8 +74,7 @@ public class MemoryTest {
   private static final int THREADS = 8;
 
   public void testTensorFlowMemoryThreaded() throws Exception {
-    System.out.println("Processing "+this.X.length+" floats.");
-    System.out.println(Arrays.toString(X));
+    System.out.println("Processing " + this.X.length + " floats.");
 
     // create a graph and session
     try (Graph g = new Graph(); Session s = new Session(g)) {
