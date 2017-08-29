@@ -8,13 +8,47 @@ import org.tensorflow.Tensor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.Arrays;
 
 public class MemoryTest {
+
   // a float array to perform work on
-  private static final float[] X = new float[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
+  private final float[] X;
+
+  public MemoryTest(float[] floatArray) {
+    this.X = floatArray;
+  }
+
+  private static final float[] CONSTANT_INTS = new float[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0}; 
+
+
+  private static float[] randomFloats(int length) {
+    Random rng = new Random();
+    float[] floatArray = new float[length];
+
+    for (int i=0; i<length; ++i) {
+      floatArray[i] = rng.nextFloat();
+    }
+
+    return floatArray;
+  }
+
+  private static float[] randomIntFloats(int length) {
+    Random rng = new Random();
+    float[] floatArray = new float[length];
+
+    for (int i=0; i<length; ++i) {
+      floatArray[i] = rng.nextInt() % 10;
+    }
+
+    return floatArray;
+  }
 
 
   public void testTensorFlowMemory() {
+    System.out.println(Arrays.toString(X));
+
     // create a graph and session
     try (Graph g = new Graph(); Session s = new Session(g)) {
       // create a placeholder x and a const for the dimension to do a cumulative sum along
@@ -40,6 +74,9 @@ public class MemoryTest {
   private static final int THREADS = 8;
 
   public void testTensorFlowMemoryThreaded() throws Exception {
+    System.out.println("Processing "+this.X.length+" floats.");
+    System.out.println(Arrays.toString(X));
+
     // create a graph and session
     try (Graph g = new Graph(); Session s = new Session(g)) {
       Output x = g.opBuilder("Placeholder", "x").setAttr("dtype", DataType.FLOAT).build().output(0);
@@ -49,7 +86,7 @@ public class MemoryTest {
       // make threads to do BusyWork with this graph
       List<Thread> threads = new LinkedList<>();
       for (int i = 0; i < THREADS; i++) {
-        Thread newThread = new Thread(new BusyWork(s), "BusyWork-" + i);
+        Thread newThread = new Thread(new BusyWork(s, this.X), "BusyWork-" + i);
         newThread.start();
         threads.add(newThread);
       }
@@ -63,21 +100,35 @@ public class MemoryTest {
   }
 
   public static void main(String[] args) throws Exception {
-    new MemoryTest().testTensorFlowMemoryThreaded();
+    int numFloats = 50;
+    if (args.length > 0) {
+      numFloats = Integer.parseInt(args[0]);
+    }
+
+    MemoryTest floatTest = new MemoryTest(randomFloats(numFloats));
+    floatTest.testTensorFlowMemoryThreaded();
+
+    // MemoryTest intFloatTest = new MemoryTest(randomIntFloats(numFloats));
+    // intFloatTest.testTensorFlowMemoryThreaded();
+    
+    // MemoryTest intFloatTest = new MemoryTest(CONSTANT_INTS);
+    // intFloatTest.testTensorFlowMemoryThreaded();
   }
 
   public static class BusyWork implements Runnable {
 
-    private Session s;
+    private final Session s;
+    private final float[] floatArray;
 
-    public BusyWork(Session s) {
+    public BusyWork(Session s, float[] floatArray) {
       this.s = s;
+      this.floatArray = floatArray;
     }
 
     @Override
     public void run() {
       for (int i = 0; i < 1000000000; i++) {
-        Tensor tx = Tensor.create(X);
+        Tensor tx = Tensor.create(this.floatArray);
         List<Tensor> results = this.s.runner().feed("x", tx).fetch("y").run();
         tx.close();
         for (Tensor result : results)
