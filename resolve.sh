@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+if ! [ $2 ]; then
+	echo "USAGE:   resolve.sh TF_REV TF_TYPE"
+	echo "example: "
+	echo "         resolve.sh 1.3.0 gpu"
+	exit
+fi
+
+TF_REV=$1
+TF_TYPE=$2
 
 # tensorflow revision
 if ! [ $TF_REV ]; then
@@ -25,7 +34,7 @@ mkdir ./jni
 
 echo "Downloading: ${JNI_URL}"
 curl -L ${JNI_URL} |
-tar --warning=no-timestamp -xz -C ./jni
+tar --warning=no-timestamp -xz -C ./jni || exit
 
 echo "Downloading: ${JAR_URL}"
-curl -o libtensorflow.jar ${JAR_URL}
+curl -o libtensorflow.jar ${JAR_URL} 

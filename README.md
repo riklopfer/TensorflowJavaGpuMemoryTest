@@ -4,25 +4,22 @@ Borrowed heavily from https://github.com/jpangburn/tensorflowmemorytest
 
 ## Download Dependencies
 
-|ENV Variable|Purpose|Default|
-|---|---|---|
-|TF_REV|Revision to pull|`1.3.0`|
-|TF_TYPE|`cpu` or `gpu`|`gpu`|
+```
+USAGE:   resolve.sh TF_REV TF_TYPE
+example: 
+         resolve.sh 1.3.0 gpu
+```
 
 GPU
 
 ```shell
-export TF_REV=1.3.0
-export TF_TYPE=gpu
-./resolve.sh
+./resolve.sh 1.3.0 gpu
 ```
 
 CPU
 
-```shell
-export TF_REV=1.3.0
-export TF_TYPE=cpu
-./resolve.sh
+```shell 
+./resolve.sh 1.3.0 cpu
 ```
 
 
