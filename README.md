@@ -40,9 +40,7 @@ To reproduce this issue, run the following:
 
 ```shell
 # resolve 
-export TF_REV=1.3.0
-export TF_TYPE=gpu
-./resolve.sh
+./resolve.sh 1.3.0 gpu
 
 # build
 ./build.sh

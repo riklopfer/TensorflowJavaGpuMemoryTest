@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 if ! [ $2 ]; then
 	echo "USAGE:   resolve.sh TF_REV TF_TYPE"
+	echo "TF_REV  -> tensorflow revision"
+	echo "TF_TYPE -> gpu or cpu"
+	echo 
 	echo "example: "
 	echo "         resolve.sh 1.3.0 gpu"
 	exit
