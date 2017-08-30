@@ -75,4 +75,11 @@ Free memory: 7.81GiB
 2017-08-29 14:30:29.569981: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -> (device: 0, name: GeForce GTX 1080, pci bus id: 0000:01:00.0)
 ```
 
+### Valgrind output
 
+[valgrind output](valgrind.out) was generated with the following command:
+
+```shell
+valgrind --leak-check=yes java -Djava.compiler=NONE -cp libtensorflow.jar:./out/ -Djava.library.path=./jni/ test.MemoryTest 1000 2>&1 | tee valgrind.out
+
+```
