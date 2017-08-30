@@ -59,7 +59,9 @@ public class MemoryTest {
   private static final int THREADS = 8;
 
   public void testTensorFlowMemoryThreaded(int iterations) throws Exception {
-    System.out.println("Processing " + this.floatArray.length + " floats for "+iterations+" iterations.");
+    System.out.println(
+      String.format("Processing %d floats for %d iterations in %d threads.", this.floatArray.length, iterations, THREADS)
+      );
 
     // create a graph and session
     try (Graph g = new Graph(); Session s = new Session(g)) {
@@ -92,8 +94,8 @@ public class MemoryTest {
     iterations = iterations > 0 ? iterations : Integer.MAX_VALUE;
 
     MemoryTest floatTest = new MemoryTest(new float[]{3.14f});
-    floatTest.testTensorFlowMemory(iterations);
-    // floatTest.testTensorFlowMemoryThreaded(iterations);
+    // floatTest.testTensorFlowMemory(iterations);
+    floatTest.testTensorFlowMemoryThreaded(iterations);
   }
 
   public static class BusyWork implements Runnable {
