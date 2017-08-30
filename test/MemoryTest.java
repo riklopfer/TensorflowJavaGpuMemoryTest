@@ -84,13 +84,12 @@ public class MemoryTest {
   }
 
   public static void main(String[] args) throws Exception {
-    int iterations = 1000000;
+    int iterations = 0;
     if (args.length > 0) {
       iterations = Integer.parseInt(args[0]);
-      if (iterations < 1) {
-        throw new IllegalArgumentException("iterations must be greater than zero.");
-      }
     }
+
+    iterations = iterations > 0 ? iterations : Integer.MAX_VALUE;
 
     MemoryTest floatTest = new MemoryTest(new float[]{3.14f});
     floatTest.testTensorFlowMemory(iterations);
