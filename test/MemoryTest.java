@@ -13,11 +13,10 @@ import java.util.Arrays;
 
 public class MemoryTest {
 
-  // a float array to perform work on
-  private final float[] X;
+  private final float[] floatArray;
 
   public MemoryTest(float[] floatArray) {
-    this.X = floatArray;
+    this.floatArray = floatArray;
   }
 
   private static float[] randomFloats(int length) {
@@ -32,8 +31,8 @@ public class MemoryTest {
   }
 
 
-  public void testTensorFlowMemory() {
-    System.out.println("Processing " + this.X.length + " floats.");
+  public void testTensorFlowMemory(int iterations) {
+    System.out.println("Processing " + this.floatArray.length + " floats for "+iterations+" iterations.");
 
     // create a graph and session
     try (Graph g = new Graph(); Session s = new Session(g)) {
@@ -43,9 +42,9 @@ public class MemoryTest {
       Output dims = g.opBuilder("Const", "dims").setAttr("dtype", DataType.INT32).setAttr("value", zero).build().output(0);
       Output y = g.opBuilder("Cumsum", "y").addInput(x).addInput(dims).build().output(0);
       // loop a bunch to test memory usage
-      for (int i = 0; i < 10000000; i++) {
+      for (int i = 0; i < iterations; i++) {
         // create a tensor from X
-        Tensor tx = Tensor.create(X);
+        Tensor tx = Tensor.create(this.floatArray);
         // run the graph and fetch the resulting y tensor
         Tensor ty = s.runner().feed("x", tx).fetch("y").run().get(0);
         // close the tensors to release their resources
@@ -59,8 +58,8 @@ public class MemoryTest {
 
   private static final int THREADS = 8;
 
-  public void testTensorFlowMemoryThreaded() throws Exception {
-    System.out.println("Processing " + this.X.length + " floats.");
+  public void testTensorFlowMemoryThreaded(int iterations) throws Exception {
+    System.out.println("Processing " + this.floatArray.length + " floats for "+iterations+" iterations.");
 
     // create a graph and session
     try (Graph g = new Graph(); Session s = new Session(g)) {
@@ -71,7 +70,7 @@ public class MemoryTest {
       // make threads to do BusyWork with this graph
       List<Thread> threads = new LinkedList<>();
       for (int i = 0; i < THREADS; i++) {
-        Thread newThread = new Thread(new BusyWork(s, this.X), "BusyWork-" + i);
+        Thread newThread = new Thread(new BusyWork(s, this.floatArray, iterations), "BusyWork-" + i);
         newThread.start();
         threads.add(newThread);
       }
@@ -85,31 +84,34 @@ public class MemoryTest {
   }
 
   public static void main(String[] args) throws Exception {
-    int numFloats = 1;
+    int iterations = 1000000;
     if (args.length > 0) {
-      numFloats = Integer.parseInt(args[0]);
-      if (numFloats < 1) {
-        throw new IllegalArgumentException("numFloats must be greater than zero.");
+      iterations = Integer.parseInt(args[0]);
+      if (iterations < 1) {
+        throw new IllegalArgumentException("iterations must be greater than zero.");
       }
     }
 
-    MemoryTest floatTest = new MemoryTest(randomFloats(numFloats));
-    floatTest.testTensorFlowMemoryThreaded();
+    MemoryTest floatTest = new MemoryTest(new float[]{3.14f});
+    floatTest.testTensorFlowMemory(iterations);
+    // floatTest.testTensorFlowMemoryThreaded(iterations);
   }
 
   public static class BusyWork implements Runnable {
 
     private final Session s;
     private final float[] floatArray;
+    private final int iterations;
 
-    public BusyWork(Session s, float[] floatArray) {
+    public BusyWork(Session s, float[] floatArray, int iterations) {
       this.s = s;
       this.floatArray = floatArray;
+      this.iterations = iterations;
     }
 
     @Override
     public void run() {
-      for (int i = 0; i < 1000000000; i++) {
+      for (int i = 0; i < this.iterations; i++) {
         Tensor tx = Tensor.create(this.floatArray);
         List<Tensor> results = this.s.runner().feed("x", tx).fetch("y").run();
         tx.close();
